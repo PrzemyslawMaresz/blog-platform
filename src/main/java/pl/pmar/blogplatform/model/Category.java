@@ -3,7 +3,7 @@ package pl.pmar.blogplatform.model;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.util.List;
+import java.util.Set;
 
 @Data
 @Entity
@@ -18,5 +18,5 @@ public class Category {
     private String name;
 
     @OneToMany(mappedBy = "category")
-    private List<Post> posts;
+    private Set<Post> posts;
 }

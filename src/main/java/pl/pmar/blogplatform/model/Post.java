@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Set;
 
 @Data
 @Entity
@@ -34,9 +34,9 @@ public class Post {
     @JoinColumn(name = "category_id")
     private Category category;
 
-    @OneToMany(mappedBy = "post")
-    private List<Comment> comments;
+    @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
+    private Set<Comment> comments;
 
-    @OneToMany(mappedBy = "post")
-    private List<Like> likes;
+    @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
+    private Set<Like> likes;
 }

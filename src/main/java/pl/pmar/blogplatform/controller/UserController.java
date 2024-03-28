@@ -1,16 +1,15 @@
 package pl.pmar.blogplatform.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import pl.pmar.blogplatform.model.Post;
 import pl.pmar.blogplatform.model.User;
 import pl.pmar.blogplatform.service.UserService;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/api")
 public class UserController {
 
     private final UserService userService;
@@ -19,8 +18,29 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping("/list")
+    @GetMapping("/users")
     public List<User> getAllUsers() {
         return userService.getAllUsers();
+    }
+
+    @GetMapping("/users/{id}")
+    public User getUserById(@PathVariable Integer id) {
+        return userService.getUserById(id);
+    }
+
+    @PostMapping
+    public User saveUser(@RequestBody User user) {
+        return userService.saveUser(user);
+    }
+
+    @DeleteMapping("/users/{id}")
+    public void deleteUser(@PathVariable Integer id) {
+        System.out.println("Deleting user with id: " + id);
+        userService.deleteUser(id);
+    }
+
+    @GetMapping("/users/{id}/posts")
+    public List<Post> getUserPosts(@PathVariable Integer id) {
+        return userService.getUserPosts(id);
     }
 }

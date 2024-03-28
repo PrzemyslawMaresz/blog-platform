@@ -3,7 +3,7 @@ package pl.pmar.blogplatform.model;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.util.List;
+import java.util.Set;
 
 @Data
 @Entity
@@ -28,12 +28,12 @@ public class User {
     @Column(name = "role")
     private String role;
 
-    @OneToMany(mappedBy = "user")
-    private List<Post> posts;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE , orphanRemoval = true)
+    private Set<Post> posts;
 
-    @OneToMany(mappedBy = "user")
-    private List<Comment> comments;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE , orphanRemoval = true)
+    private Set<Comment> comments;
 
-    @OneToMany(mappedBy = "user")
-    private List<Like> likes;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE , orphanRemoval = true)
+    private Set<Like> likes;
 }
