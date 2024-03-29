@@ -1,12 +1,17 @@
 package pl.pmar.blogplatform.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
-@Data
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name = "posts")
 public class Post {
@@ -17,7 +22,7 @@ public class Post {
     @Column(name = "title")
     private String title;
 
-    @Column(name = "content")
+    @Column(name = "content", columnDefinition = "TEXT")
     private String content;
 
     @Column(name = "creation_date")
@@ -27,16 +32,18 @@ public class Post {
     private LocalDateTime modificationDate;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
     @ManyToOne
     @JoinColumn(name = "category_id")
     private Category category;
 
-    @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
-    private Set<Comment> comments;
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "post_id", referencedColumnName = "id")
+    private List<Comment> comments;
 
-    @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
-    private Set<Like> likes;
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name= "post_id", referencedColumnName = "id")
+    private List<Like> likes;
 }

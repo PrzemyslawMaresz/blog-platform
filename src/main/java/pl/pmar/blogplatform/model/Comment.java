@@ -1,11 +1,14 @@
 package pl.pmar.blogplatform.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
-@Data
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name = "comments")
 public class Comment {
@@ -23,8 +26,4 @@ public class Comment {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
-
-    @ManyToOne
-    @JoinColumn(name = "post_id")
-    private Post post;
 }

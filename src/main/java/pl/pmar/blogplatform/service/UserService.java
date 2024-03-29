@@ -13,9 +13,12 @@ import java.util.List;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final PostService postService;
+
     @Autowired
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, PostService postService) {
         this.userRepository = userRepository;
+        this.postService = postService;
     }
 
     public List<User> getAllUsers() {
@@ -32,15 +35,11 @@ public class UserService {
     }
 
     public void deleteUser(Integer id) {
+        List<Post> userPosts = postService.getUserPosts(id);
+        for (Post post : userPosts) {
+            postService.deletePost(post.getId());
+        }
         userRepository.deleteById(id);
     }
 
-    public List<Post> getUserPosts(Integer id) {
-        User user = userRepository.findById(id).orElse(null);
-        if (user != null) {
-            return user.getPosts().stream().toList();
-        } else {
-            return Collections.emptyList();
-        }
-    }
 }

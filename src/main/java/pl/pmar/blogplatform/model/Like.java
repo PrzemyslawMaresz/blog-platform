@@ -1,9 +1,12 @@
 package pl.pmar.blogplatform.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 
-@Data
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name = "likes")
 public class Like {
@@ -16,7 +19,4 @@ public class Like {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToOne
-    @JoinColumn(name = "post_id")
-    private Post post;
 }

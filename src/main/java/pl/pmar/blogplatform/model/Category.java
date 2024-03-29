@@ -1,11 +1,14 @@
 package pl.pmar.blogplatform.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 
 import java.util.Set;
 
-@Data
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name = "categories")
 public class Category {
@@ -16,7 +19,4 @@ public class Category {
 
     @Column(name = "name")
     private String name;
-
-    @OneToMany(mappedBy = "category")
-    private Set<Post> posts;
 }

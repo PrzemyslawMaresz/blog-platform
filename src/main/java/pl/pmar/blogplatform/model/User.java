@@ -1,11 +1,16 @@
 package pl.pmar.blogplatform.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 
+import java.util.List;
 import java.util.Set;
 
-@Data
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name = "users")
 public class User {
@@ -28,12 +33,8 @@ public class User {
     @Column(name = "role")
     private String role;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE , orphanRemoval = true)
-    private Set<Post> posts;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE , orphanRemoval = true)
-    private Set<Comment> comments;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE , orphanRemoval = true)
-    private Set<Like> likes;
+
+
 }

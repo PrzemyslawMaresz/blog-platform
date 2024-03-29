@@ -28,19 +28,13 @@ public class UserController {
         return userService.getUserById(id);
     }
 
-    @PostMapping
+    @PostMapping("/users")
     public User saveUser(@RequestBody User user) {
         return userService.saveUser(user);
     }
 
     @DeleteMapping("/users/{id}")
     public void deleteUser(@PathVariable Integer id) {
-        System.out.println("Deleting user with id: " + id);
         userService.deleteUser(id);
-    }
-
-    @GetMapping("/users/{id}/posts")
-    public List<Post> getUserPosts(@PathVariable Integer id) {
-        return userService.getUserPosts(id);
     }
 }
