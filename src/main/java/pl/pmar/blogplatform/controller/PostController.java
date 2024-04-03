@@ -1,7 +1,9 @@
 package pl.pmar.blogplatform.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import pl.pmar.blogplatform.model.Comment;
 import pl.pmar.blogplatform.model.Post;
 import pl.pmar.blogplatform.service.PostService;
 
@@ -19,32 +21,37 @@ public class PostController {
     }
 
     @GetMapping("/posts")
-    public List<Post> getAllPosts() {
+    public ResponseEntity<List<Post>> getAllPosts() {
         return postService.getAllPosts();
     }
 
     @GetMapping("/posts/{id}")
-    public Post getPostById(@PathVariable Integer id) {
+    public ResponseEntity<Post> getPostById(@PathVariable Integer id) {
         return postService.getPostById(id);
     }
 
     @GetMapping("/users/{id}/posts")
-    public List<Post> getUserPosts(@PathVariable Integer id) {
+    public ResponseEntity<List<Post>> getUserPosts(@PathVariable Integer id) {
         return postService.getUserPosts(id);
     }
 
     @PostMapping("/posts")
-    public Post createPost(@RequestBody Post post, @RequestParam Integer userId) {
+    public ResponseEntity<Post> createPost(@RequestBody Post post, @RequestParam Integer userId) {
         return postService.createPost(post, userId);
     }
 
     @PutMapping("/posts")
-    public Post updatePost(@RequestBody Post post) {
+    public ResponseEntity<Post> updatePost(@RequestBody Post post) {
         return postService.updatePost(post);
     }
 
     @DeleteMapping("/posts/{id}")
-    public void deletePost(@PathVariable Integer id) {
-        postService.deletePost(id);
+    public ResponseEntity<Void> deletePost(@PathVariable Integer id) {
+        return postService.deletePost(id);
+    }
+
+    @GetMapping("/posts/{id}/comments")
+    public ResponseEntity<List<Comment>> getPostComments(@PathVariable Integer id) {
+        return postService.getPostComments(id);
     }
 }

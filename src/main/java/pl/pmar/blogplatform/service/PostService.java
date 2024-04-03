@@ -1,7 +1,10 @@
 package pl.pmar.blogplatform.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import pl.pmar.blogplatform.model.Comment;
 import pl.pmar.blogplatform.model.Post;
 import pl.pmar.blogplatform.model.User;
 import pl.pmar.blogplatform.repository.PostRepository;
@@ -9,6 +12,7 @@ import pl.pmar.blogplatform.repository.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PostService {
@@ -22,34 +26,61 @@ public class PostService {
         this.userRepository = userRepository;
     }
 
-    public List<Post> getAllPosts() {
-        return postRepository.findAll();
+    public ResponseEntity<List<Post>> getAllPosts() {
+        List<Post> posts = postRepository.findAll();
+        return ResponseEntity.ok(posts);
     }
 
-    public Post getPostById(Integer id) {
-        return postRepository.findById(id).orElse(null);
+    public ResponseEntity<Post> getPostById(Integer id) {
+        Optional<Post> post = postRepository.findById(id);
+        return post
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
-    public Post createPost(Post post, Integer userId) {
-        User user = userRepository.findById(userId).orElse(null);
-        post.setUser(user);
+    public ResponseEntity<List<Post>> getUserPosts(Integer id) {
+        List<Post> posts = postRepository.findAllByUserId(id);
+        return ResponseEntity.ok(posts);
+    }
+
+    public ResponseEntity<Post> createPost(Post post, Integer userId) {
+        Optional<User> user = userRepository.findById(userId);
+        if (user.isPresent()) {
+            post.setUser(user.get());
+            LocalDateTime now = LocalDateTime.now();
+            post.setCreationDate(now);
+            post.setModificationDate(now);
+            Post savedPost =  postRepository.save(post);
+            return ResponseEntity.status(HttpStatus.CREATED).body(savedPost);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+
+    }
+
+    public ResponseEntity<Post> updatePost(Post post) {
         LocalDateTime now = LocalDateTime.now();
-        post.setCreationDate(now);
         post.setModificationDate(now);
-        return postRepository.save(post);
+        Post savedPost = postRepository.save(post);
+        return ResponseEntity.ok(savedPost);
     }
 
-    public Post updatePost(Post post) {
-        LocalDateTime now = LocalDateTime.now();
-        post.setModificationDate(now);
-        return postRepository.save(post);
+    public ResponseEntity<Void> deletePost(Integer id) {
+        Optional<Post> post = postRepository.findById(id);
+        if (post.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        } else {
+            postRepository.deleteById(id);
+            return ResponseEntity.noContent().build();
+        }
+
     }
 
-    public void deletePost(Integer id) {
-        postRepository.deleteById(id);
-    }
 
-    public List<Post> getUserPosts(Integer id) {
-        return postRepository.findAllByUserId(id);
+    public ResponseEntity<List<Comment>> getPostComments(Integer id) {
+        Optional<Post> post = postRepository.findById(id);
+        return post
+                .map(p -> ResponseEntity.ok(p.getComments()))
+                .orElse(ResponseEntity.notFound().build());
     }
 }
