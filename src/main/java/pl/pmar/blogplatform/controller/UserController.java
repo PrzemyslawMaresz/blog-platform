@@ -2,6 +2,7 @@ package pl.pmar.blogplatform.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import pl.pmar.blogplatform.model.entity.User;
 import pl.pmar.blogplatform.service.UserService;
@@ -23,20 +24,12 @@ public class UserController {
         return userService.getAllUsers();
     }
 
+
     @GetMapping("/users/{id}")
     public ResponseEntity<User> getUserById(@PathVariable Integer id) {
         return userService.getUserById(id);
     }
 
-//    @PostMapping("/users")
-//    public ResponseEntity<User> saveUser(@RequestBody User user) {
-//        return userService.saveUser(user);
-//    }
-
-//    @PutMapping("/users")
-//    public ResponseEntity<User> updateUser(@RequestBody User user) {
-//        return userService.saveUser(user);
-//    }
 
     @DeleteMapping("/users/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Integer id) {
