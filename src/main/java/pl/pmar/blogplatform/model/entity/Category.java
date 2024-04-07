@@ -1,4 +1,4 @@
-package pl.pmar.blogplatform.model;
+package pl.pmar.blogplatform.model.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -8,15 +8,13 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "likes")
-public class Like {
+@Table(name = "categories")
+public class Category {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Integer id;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
-
+    @Column(name = "name")
+    private String name;
 }

@@ -2,7 +2,7 @@ package pl.pmar.blogplatform.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import pl.pmar.blogplatform.model.Post;
+import pl.pmar.blogplatform.model.entity.Post;
 
 import java.util.List;
 

@@ -1,13 +1,12 @@
 package pl.pmar.blogplatform.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import pl.pmar.blogplatform.model.Post;
+import pl.pmar.blogplatform.model.entity.Post;
 import pl.pmar.blogplatform.repository.PostRepository;
 import pl.pmar.blogplatform.repository.UserRepository;
-import pl.pmar.blogplatform.model.User;
+import pl.pmar.blogplatform.model.entity.User;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,10 +35,10 @@ public class UserService {
 
     }
 
-    public ResponseEntity<User> saveUser(User user) {
-        User savedUser = userRepository.save(user);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
-    }
+//    public ResponseEntity<User> saveUser(User user) {
+//        User savedUser = userRepository.save(user);
+//        return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
+//    }
 
     public ResponseEntity<Void> deleteUser(Integer id) {
         Optional<User> user = userRepository.findById(id);
@@ -53,5 +52,9 @@ public class UserService {
         }
 
     }
+
+
+
+
 
 }

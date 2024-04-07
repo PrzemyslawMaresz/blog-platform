@@ -3,7 +3,7 @@ package pl.pmar.blogplatform.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import pl.pmar.blogplatform.model.Category;
+import pl.pmar.blogplatform.model.entity.Category;
 import pl.pmar.blogplatform.service.CategoryService;
 
 import java.util.List;

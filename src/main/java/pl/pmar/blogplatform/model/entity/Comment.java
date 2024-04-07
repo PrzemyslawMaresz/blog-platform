@@ -1,4 +1,4 @@
-package pl.pmar.blogplatform.model;
+package pl.pmar.blogplatform.model.entity;
 
 import jakarta.persistence.*;
 import lombok.*;

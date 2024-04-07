@@ -3,8 +3,8 @@ package pl.pmar.blogplatform.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import pl.pmar.blogplatform.model.Comment;
-import pl.pmar.blogplatform.model.Post;
+import pl.pmar.blogplatform.model.entity.Comment;
+import pl.pmar.blogplatform.model.entity.Post;
 import pl.pmar.blogplatform.service.PostService;
 
 import java.util.List;
