@@ -9,7 +9,6 @@ import pl.pmar.blogplatform.security.payload.request.LoginRequest;
 import pl.pmar.blogplatform.security.payload.request.SignupRequest;
 import pl.pmar.blogplatform.service.AuthService;
 
-@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("api/auth")
 public class AuthController {

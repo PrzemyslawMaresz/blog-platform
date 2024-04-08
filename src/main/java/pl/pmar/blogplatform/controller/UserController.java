@@ -2,14 +2,12 @@ package pl.pmar.blogplatform.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import pl.pmar.blogplatform.model.entity.User;
 import pl.pmar.blogplatform.service.UserService;
 
 import java.util.List;
 
-@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/api")
 public class UserController {
