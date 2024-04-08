@@ -1,11 +1,12 @@
 package pl.pmar.blogplatform.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import pl.pmar.blogplatform.model.payload.request.SignupRequest;
-import pl.pmar.blogplatform.model.payload.request.TokenRefreshRequest;
+import pl.pmar.blogplatform.security.payload.request.LoginRequest;
+import pl.pmar.blogplatform.security.payload.request.SignupRequest;
 import pl.pmar.blogplatform.service.AuthService;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -20,8 +21,9 @@ public class AuthController {
         this.authService = authService;
     }
 
+
     @PostMapping("/signin")
-    public ResponseEntity<?> authenticateUser(@Valid @RequestBody SignupRequest loginRequest) {
+    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
         return authService.authenticateUser(loginRequest);
     }
 
@@ -30,8 +32,13 @@ public class AuthController {
         return authService.registerUser(signupRequest);
     }
 
+    @PostMapping("/signout")
+    public ResponseEntity<?> logoutUser() {
+        return authService.logoutUser();
+    }
+
     @PostMapping("/refreshtoken")
-    public ResponseEntity<?> refreshToken(@Valid @RequestBody TokenRefreshRequest request) {
+    public ResponseEntity<?> refreshToken(HttpServletRequest request) {
         return authService.refreshToken(request);
     }
 }

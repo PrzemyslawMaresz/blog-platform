@@ -6,7 +6,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import pl.pmar.blogplatform.model.entity.Role;
 import pl.pmar.blogplatform.model.enums.RoleEnum;
-import pl.pmar.blogplatform.model.payload.request.SignupRequest;
+import pl.pmar.blogplatform.security.payload.request.SignupRequest;
 import pl.pmar.blogplatform.repository.RoleRepository;
 import pl.pmar.blogplatform.repository.UserRepository;
 import pl.pmar.blogplatform.service.AuthService;

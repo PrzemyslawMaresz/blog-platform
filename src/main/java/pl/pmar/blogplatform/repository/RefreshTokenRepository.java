@@ -1,6 +1,7 @@
 package pl.pmar.blogplatform.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import pl.pmar.blogplatform.model.entity.RefreshToken;
 import pl.pmar.blogplatform.model.entity.User;
 
@@ -10,5 +11,5 @@ public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Inte
 
     Optional<RefreshToken> findByToken(String token);
 
-    Optional<RefreshToken> findByUser(User user);
+    void deleteByUser(User user);
 }

@@ -1,4 +1,4 @@
-package pl.pmar.blogplatform.model.payload.request;
+package pl.pmar.blogplatform.security.payload.request;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;

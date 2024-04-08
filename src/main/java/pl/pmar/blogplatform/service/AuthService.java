@@ -1,6 +1,9 @@
 package pl.pmar.blogplatform.service;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -13,11 +16,10 @@ import pl.pmar.blogplatform.model.entity.RefreshToken;
 import pl.pmar.blogplatform.model.entity.Role;
 import pl.pmar.blogplatform.model.enums.RoleEnum;
 import pl.pmar.blogplatform.model.entity.User;
-import pl.pmar.blogplatform.model.payload.request.SignupRequest;
-import pl.pmar.blogplatform.model.payload.request.TokenRefreshRequest;
-import pl.pmar.blogplatform.model.payload.response.JwtResponse;
-import pl.pmar.blogplatform.model.payload.response.MessageResponse;
-import pl.pmar.blogplatform.model.payload.response.TokenRefreshResponse;
+import pl.pmar.blogplatform.security.payload.request.LoginRequest;
+import pl.pmar.blogplatform.security.payload.request.SignupRequest;
+import pl.pmar.blogplatform.security.payload.response.UserInfoResponse;
+import pl.pmar.blogplatform.security.payload.response.MessageResponse;
 import pl.pmar.blogplatform.repository.RoleRepository;
 import pl.pmar.blogplatform.repository.UserRepository;
 import pl.pmar.blogplatform.security.exception.TokenRefreshException;
@@ -27,6 +29,7 @@ import pl.pmar.blogplatform.security.service.UserDetailsImpl;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 
@@ -117,7 +120,8 @@ public class AuthService {
         return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
     }
 
-    public ResponseEntity<?> authenticateUser(SignupRequest loginRequest) {
+    public ResponseEntity<?> authenticateUser(LoginRequest loginRequest) {
+        logoutUser();
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginRequest.getUsername(),
@@ -125,9 +129,9 @@ public class AuthService {
         );
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwt = jwtUtils.generateJwtToken(authentication);
-
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+        ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(userDetails);
+
         List<String> roles = userDetails
                 .getAuthorities()
                 .stream()
@@ -135,32 +139,56 @@ public class AuthService {
                 .toList();
 
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getId());
+        ResponseCookie jwtRefreshCookie = jwtUtils.generateRefreshJwtCookie(refreshToken.getToken());
 
 
-        return ResponseEntity.ok(new JwtResponse(
-                jwt,
-                refreshToken.getToken(),
-                userDetails.getId(),
-                userDetails.getUsername(),
-                userDetails.getEmail(),
-                roles
-        ));
+        return ResponseEntity
+                .ok()
+                .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
+                .header(HttpHeaders.SET_COOKIE, jwtRefreshCookie.toString())
+                .body(new UserInfoResponse(
+                        userDetails.getId(),
+                        userDetails.getUsername(),
+                        userDetails.getEmail(),
+                        roles
+                ));
     }
 
-    public ResponseEntity<?> refreshToken(TokenRefreshRequest request) {
+    public ResponseEntity<?> logoutUser() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (!Objects.equals(principal.toString(), "anonymousUser")) {
+            Integer userId = ((UserDetailsImpl) principal).getId();
+            refreshTokenService.deleteByUserId(userId);
+        }
 
-        String requestRefreshToken = request.getRefreshToken();
+        ResponseCookie jwtCookie = jwtUtils.getCleanJwtCookie();
+        ResponseCookie jwtRefreshCookie = jwtUtils.getCleanJwtRefreshCookie();
 
-        return refreshTokenService.findByToken(requestRefreshToken)
-                .map(refreshTokenService::verifyExpiration)
-                .map(RefreshToken::getUser)
-                .map(user -> {
-                    String token = jwtUtils.generateJwtTokenFromUsername(user.getUsername());
-                    return ResponseEntity.ok(new TokenRefreshResponse(token, requestRefreshToken));
-                })
-                .orElseThrow(() -> new TokenRefreshException(
-                        requestRefreshToken,
-                        "Refresh token is not in database!"
-                ));
+        return ResponseEntity
+                .ok()
+                .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
+                .header(HttpHeaders.SET_COOKIE, jwtRefreshCookie.toString())
+                .body(new MessageResponse("Logout successful!"));
+    }
+
+    public ResponseEntity<?> refreshToken(HttpServletRequest request) {
+
+        String refreshToken = jwtUtils.getRefreshJwtFromCookies(request);
+
+        if ((refreshToken != null) && (!refreshToken.isEmpty())) {
+            return refreshTokenService.findByToken(refreshToken)
+                    .map(refreshTokenService::verifyExpiration)
+                    .map(RefreshToken::getUser)
+                    .map(user -> {
+                        ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(user);
+
+                        return ResponseEntity
+                                .ok()
+                                .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
+                                .body(new MessageResponse("Token refreshed successfully!"));
+                    })
+                    .orElseThrow(() -> new TokenRefreshException(refreshToken, "Invalid refresh token!"));
+        }
+        return ResponseEntity.badRequest().body(new MessageResponse("No refresh token provided!"));
     }
 }

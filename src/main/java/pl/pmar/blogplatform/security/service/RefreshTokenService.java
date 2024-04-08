@@ -3,6 +3,7 @@ package pl.pmar.blogplatform.security.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pl.pmar.blogplatform.model.entity.RefreshToken;
 import pl.pmar.blogplatform.model.entity.User;
 import pl.pmar.blogplatform.repository.RefreshTokenRepository;
@@ -38,32 +39,25 @@ public class RefreshTokenService {
 
 
     public RefreshToken createRefreshToken(Integer userId) {
-        User user = userRepository.findById(userId).orElseThrow();
-        deleteTokenByUserIfExists(user);
-
         RefreshToken refreshToken = new RefreshToken();
-        refreshToken.setUser(user);
-        long refreshTokenDuration = Long.parseLong(refreshTokenDurationStr);
-        refreshToken.setExpiryDate(Instant.now().plusMillis(refreshTokenDuration));
+        refreshToken.setUser(userRepository.findById(userId).orElseThrow());
+        refreshToken.setExpiryDate(Instant.now().plusMillis(Long.parseLong(refreshTokenDurationStr)));
         refreshToken.setToken(UUID.randomUUID().toString());
         refreshTokenRepository.save(refreshToken);
         return refreshToken;
     }
 
-    public void deleteTokenByUserIfExists(User user) {
-        Optional<RefreshToken> refreshToken = refreshTokenRepository.findByUser(user);
-        refreshToken.ifPresent(refreshTokenRepository::delete);
-    }
 
     public RefreshToken verifyExpiration(RefreshToken token) {
-        if (isTokenExpired(token)) {
+        if (token.getExpiryDate().compareTo(Instant.now()) < 0) {
             refreshTokenRepository.delete(token);
             throw new TokenRefreshException(token.getToken(), "Refresh token was expired. Please make a new signin request");
         }
         return token;
     }
 
-    public boolean isTokenExpired(RefreshToken token) {
-        return token.getExpiryDate().compareTo(Instant.now()) < 0;
+    @Transactional
+    public void deleteByUserId(Integer userId) {
+        refreshTokenRepository.deleteByUser(userRepository.findById(userId).orElseThrow());
     }
 }

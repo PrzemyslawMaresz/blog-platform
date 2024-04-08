@@ -1,4 +1,4 @@
-package pl.pmar.blogplatform.model.payload.response;
+package pl.pmar.blogplatform.security.payload.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
