@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import pl.pmar.blogplatform.model.entity.Like;
 import pl.pmar.blogplatform.service.LikeService;
 
+@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/api")
 public class LikeController {

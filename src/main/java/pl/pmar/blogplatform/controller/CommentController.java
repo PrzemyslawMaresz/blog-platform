@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import pl.pmar.blogplatform.model.entity.Comment;
 import pl.pmar.blogplatform.service.CommentService;
 
+@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/api")
 public class CommentController {

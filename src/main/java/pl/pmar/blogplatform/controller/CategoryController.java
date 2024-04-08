@@ -8,6 +8,7 @@ import pl.pmar.blogplatform.service.CategoryService;
 
 import java.util.List;
 
+@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/api")
 public class CategoryController {
