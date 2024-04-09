@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import pl.pmar.blogplatform.model.entity.Role;
+import pl.pmar.blogplatform.model.entity.User;
 import pl.pmar.blogplatform.model.enums.RoleEnum;
 import pl.pmar.blogplatform.security.payload.request.SignupRequest;
 import pl.pmar.blogplatform.repository.RoleRepository;
@@ -60,8 +61,12 @@ public class DataInit implements CommandLineRunner {
             signupRequest.setUsername(adminUsername);
             signupRequest.setEmail("admin@gmail.com");
             signupRequest.setPassword(adminPassword);
-            signupRequest.setRoles(Set.of("admin"));
             authService.registerUser(signupRequest);
+
+            User admin = userRepository.findByUsername(adminUsername).get();
+            Set<Role> roles = Set.of(roleRepository.findByName(RoleEnum.ROLE_ADMIN).orElseThrow());
+            admin.setRoles(roles);
+            userRepository.save(admin);
         }
     }
 }
