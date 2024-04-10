@@ -28,7 +28,6 @@ public class CommentController {
         return commentService.addComment(comment, postId);
     }
 
-    @PreAuthorize("hasRole('ADMIN') or #comment.author.id == authentication.principal.id")
     @PutMapping("/comments")
     public ResponseEntity<Comment> updateComment(@RequestBody Comment comment) {
         return commentService.updateComment(comment);

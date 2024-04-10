@@ -41,7 +41,7 @@ public class PostController {
         return postService.createPost(post);
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN') or #post.author.id == authentication.principal.id")
+
     @PutMapping("/posts")
     public ResponseEntity<Post> updatePost(@RequestBody Post post) {
         return postService.updatePost(post);

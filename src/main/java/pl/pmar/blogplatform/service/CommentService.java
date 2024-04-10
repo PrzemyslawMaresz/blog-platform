@@ -67,6 +67,11 @@ public class CommentService {
             return ResponseEntity.notFound().build();
         }
         Comment comment = commentOptional.get();
+
+        if (!contextService.isUserAuthorized(comment.getAuthor().getId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
         comment.setContent(updatedComment.getContent());
 
         return ResponseEntity.ok(commentRepository.save(comment));

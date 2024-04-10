@@ -62,12 +62,16 @@ public class PostService {
     }
 
     public ResponseEntity<Post> updatePost(Post updatedPost) {
-        Optional<Post> existingPost = postRepository.findById(updatedPost.getId());
-        if (existingPost.isEmpty()) {
+        Optional<Post> postOptional = postRepository.findById(updatedPost.getId());
+        if (postOptional.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
 
-        Post post = existingPost.get();
+        Post post = postOptional.get();
+
+        if (! contextService.isUserAuthorized(post.getAuthor().getId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
 
         post.setModificationDate(LocalDateTime.now());
         post.setTitle(updatedPost.getTitle());
