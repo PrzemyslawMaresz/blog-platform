@@ -5,9 +5,12 @@ import org.springframework.stereotype.Repository;
 import pl.pmar.blogplatform.model.entity.Post;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface PostRepository extends JpaRepository<Post, Integer> {
-    List<Post> findAllByUserId(Integer id);
-    Post findPostByCommentsId(Integer id);
+    List<Post> findAllByAuthorId(Integer id);
+    Optional<Post> findPostByLikesId(Integer id);
+
+    List<Post> findAllByCategoryId(Integer id);
 }

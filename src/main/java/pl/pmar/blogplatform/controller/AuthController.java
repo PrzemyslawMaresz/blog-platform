@@ -5,8 +5,8 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import pl.pmar.blogplatform.security.payload.request.LoginRequest;
-import pl.pmar.blogplatform.security.payload.request.SignupRequest;
+import pl.pmar.blogplatform.model.payload.request.LoginRequest;
+import pl.pmar.blogplatform.model.payload.request.SignupRequest;
 import pl.pmar.blogplatform.service.AuthService;
 
 @RestController

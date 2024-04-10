@@ -35,17 +35,12 @@ public class UserService {
 
     }
 
-//    public ResponseEntity<User> saveUser(User user) {
-//        User savedUser = userRepository.save(user);
-//        return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
-//    }
-
     public ResponseEntity<Void> deleteUser(Integer id) {
         Optional<User> user = userRepository.findById(id);
         if (user.isEmpty()) {
             return ResponseEntity.notFound().build();
         } else {
-            List<Post> userPosts = postRepository.findAllByUserId(id);
+            List<Post> userPosts = postRepository.findAllByAuthorId(id);
             postRepository.deleteAll(userPosts);
             userRepository.deleteById(id);
             return ResponseEntity.noContent().build();
@@ -53,8 +48,16 @@ public class UserService {
 
     }
 
+    public ResponseEntity<User> updateUser(User updatedUser) {
+        Optional<User> userOptional = userRepository.findById(updatedUser.getId());
+        if (userOptional.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        } else {
+            User user = userOptional.get();
+            user.setUsername(updatedUser.getUsername());
+            user.setEmail(updatedUser.getEmail());
 
-
-
-
+            return ResponseEntity.ok(userRepository.save(user));
+        }
+    }
 }

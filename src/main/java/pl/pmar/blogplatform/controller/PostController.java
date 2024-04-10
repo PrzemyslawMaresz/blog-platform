@@ -2,6 +2,7 @@ package pl.pmar.blogplatform.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import pl.pmar.blogplatform.model.entity.Comment;
 import pl.pmar.blogplatform.model.entity.Post;
@@ -36,10 +37,11 @@ public class PostController {
     }
 
     @PostMapping("/posts")
-    public ResponseEntity<Post> createPost(@RequestBody Post post, @RequestParam Integer userId) {
-        return postService.createPost(post, userId);
+    public ResponseEntity<Post> createPost(@RequestBody Post post) {
+        return postService.createPost(post);
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN') or #post.author.id == authentication.principal.id")
     @PutMapping("/posts")
     public ResponseEntity<Post> updatePost(@RequestBody Post post) {
         return postService.updatePost(post);
@@ -53,5 +55,10 @@ public class PostController {
     @GetMapping("/posts/{id}/comments")
     public ResponseEntity<List<Comment>> getPostComments(@PathVariable Integer id) {
         return postService.getPostComments(id);
+    }
+
+    @GetMapping("posts/category/{id}")
+    public ResponseEntity<List<Post>> getPostsByCategory(@PathVariable Integer id) {
+        return postService.getPostsByCategory(id);
     }
 }

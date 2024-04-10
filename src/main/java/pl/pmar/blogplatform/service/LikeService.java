@@ -18,44 +18,62 @@ public class LikeService {
 
     private final LikeRepository likeRepository;
     private final PostRepository postRepository;
-    private final UserRepository userRepository;
+    private final SecurityContextService contextService;
 
     @Autowired
     public LikeService(
             LikeRepository likeRepository,
             PostRepository postRepository,
-            UserRepository userRepository
+            SecurityContextService contextService
     ) {
         this.likeRepository = likeRepository;
         this.postRepository = postRepository;
-        this.userRepository = userRepository;
+        this.contextService = contextService;
     }
 
 
-    public ResponseEntity<Like> createLike(Integer postId, Integer userId) {
+    public ResponseEntity<Like> createLike(Integer postId) {
         Optional<Post> postOptional = postRepository.findById(postId);
-        Optional<User> userOptional = userRepository.findById(userId);
+        Optional<User> userOptional = contextService.getUserFromContext();
 
         if (postOptional.isEmpty() || userOptional.isEmpty()) {
             return ResponseEntity.notFound().build();
-        } else {
-            Like like = new Like();
-            like.setUser(userOptional.get());
-            Post post = postOptional.get();
-            post.getLikes().add(like);
-            Like savedLike = likeRepository.save(like);
-            return ResponseEntity.status(HttpStatus.CREATED).body(savedLike);
         }
+        int postAuthorId = postOptional.get().getAuthor().getId();
+        int userId = userOptional.get().getId();
+        if (userId == postAuthorId) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        Like like = new Like();
+        like.setUser(userOptional.get());
+        Post post = postOptional.get();
+        post.getLikes().add(like);
+        Like savedLike = likeRepository.save(like);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedLike);
 
     }
 
-    public ResponseEntity<Void> deleteLike(Integer id) {
-        Optional<Like> likeOptional = likeRepository.findById(id);
+    public ResponseEntity<Void> deleteLike(Integer likeId) {
+        Optional<Like> likeOptional = likeRepository.findById(likeId);
         if (likeOptional.isEmpty()) {
             return ResponseEntity.notFound().build();
-        } else {
-            likeRepository.delete(likeOptional.get());
-            return ResponseEntity.noContent().build();
         }
+        Like like = likeOptional.get();
+
+        Optional<User> userOptional = contextService.getUserFromContext();
+        Optional<Post> postOptional = postRepository.findPostByLikesId(like.getId());
+        if (userOptional.isEmpty() || postOptional.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        int postAuthorId = postOptional.get().getAuthor().getId();
+        if (! contextService.isUserAuthor(postAuthorId) ) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        likeRepository.delete(like);
+
+        return ResponseEntity.noContent().build();
+
     }
 }

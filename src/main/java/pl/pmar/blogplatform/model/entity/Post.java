@@ -31,7 +31,7 @@ public class Post {
 
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
-    private User user;
+    private User author;
 
     @ManyToOne
     @JoinColumn(name = "category_id")

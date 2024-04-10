@@ -1,4 +1,4 @@
-package pl.pmar.blogplatform.security.payload.request;
+package pl.pmar.blogplatform.model.payload.request;
 
 import java.util.Set;
 import jakarta.validation.constraints.*;

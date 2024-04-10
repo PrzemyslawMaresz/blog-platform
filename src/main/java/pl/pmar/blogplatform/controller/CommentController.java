@@ -2,6 +2,7 @@ package pl.pmar.blogplatform.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import pl.pmar.blogplatform.model.entity.Comment;
 import pl.pmar.blogplatform.service.CommentService;
@@ -23,14 +24,11 @@ public class CommentController {
     }
 
     @PostMapping("/comments")
-    public ResponseEntity<Comment> addComment
-            (@RequestBody Comment comment,
-             @RequestParam Integer postId,
-             @RequestParam Integer userId
-            ) {
-        return commentService.addComment(comment, postId, userId);
+    public ResponseEntity<Comment> addComment(@RequestBody Comment comment, @RequestParam Integer postId) {
+        return commentService.addComment(comment, postId);
     }
 
+    @PreAuthorize("hasRole('ADMIN') or #comment.author.id == authentication.principal.id")
     @PutMapping("/comments")
     public ResponseEntity<Comment> updateComment(@RequestBody Comment comment) {
         return commentService.updateComment(comment);

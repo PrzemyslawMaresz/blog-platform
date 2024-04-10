@@ -18,17 +18,17 @@ import java.util.Optional;
 public class CommentService {
 
     private final CommentRepository commentRepository;
-    private final UserRepository userRepository;
+    private final SecurityContextService contextService;
     private final PostRepository postRepository;
 
     @Autowired
     public CommentService
             (CommentRepository commentRepository,
-            UserRepository userRepository,
-            PostRepository postRepository
+             SecurityContextService contextService,
+             PostRepository postRepository
             ) {
         this.commentRepository = commentRepository;
-        this.userRepository = userRepository;
+        this.contextService = contextService;
         this.postRepository = postRepository;
     }
 
@@ -41,25 +41,34 @@ public class CommentService {
 
     }
 
-    public ResponseEntity<Comment> addComment
-            (Comment comment,
-             Integer postId,
-             Integer userId
-            ) {
-        Optional<User> user = userRepository.findById(userId);
-        Optional<Post> post = postRepository.findById(postId);
-        if (user.isEmpty() || post.isEmpty()) {
+    public ResponseEntity<Comment> addComment(Comment comment, Integer postId) {
+        Optional<User> userOptional = contextService.getUserFromContext();
+        Optional<Post> postOptional = postRepository.findById(postId);
+        if (userOptional.isEmpty() || postOptional.isEmpty()) {
             return ResponseEntity.notFound().build();
-        } else {
-            comment.setUser(user.get());
-            comment.setCreationDate(LocalDateTime.now());
-            post.get().getComments().add(comment);
-            commentRepository.save(comment);
-            return ResponseEntity.status(HttpStatus.CREATED).body(comment);
         }
+
+        Post post = postOptional.get();
+        if (!contextService.isUserAuthorized(post.getAuthor().getId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        comment.setAuthor(userOptional.get());
+        comment.setCreationDate(LocalDateTime.now());
+        post.getComments().add(comment);
+        commentRepository.save(comment);
+        return ResponseEntity.status(HttpStatus.CREATED).body(comment);
+
     }
 
-    public ResponseEntity<Comment> updateComment(Comment comment) {
+    public ResponseEntity<Comment> updateComment(Comment updatedComment) {
+        Optional<Comment> commentOptional = commentRepository.findById(updatedComment.getId());
+        if (commentOptional.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        Comment comment = commentOptional.get();
+        comment.setContent(updatedComment.getContent());
+
         return ResponseEntity.ok(commentRepository.save(comment));
     }
 
@@ -67,9 +76,19 @@ public class CommentService {
         Optional<Comment> commentOptional = commentRepository.findById(id);
         if (commentOptional.isEmpty()) {
             return ResponseEntity.notFound().build();
-        } else {
+        }
+        int authorId = commentOptional.get().getAuthor().getId();
+
+        if (contextService.isUserAuthor(authorId)
+                || contextService.isUserAdmin()
+                || contextService.isUserModerator()
+        ) {
             commentRepository.delete(commentOptional.get());
             return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
+
+
     }
 }

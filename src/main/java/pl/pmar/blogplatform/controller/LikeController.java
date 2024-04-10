@@ -17,9 +17,10 @@ public class LikeController {
         this.likeService = likeService;
     }
 
-    @PostMapping("/likes")
-    public ResponseEntity<Like> createLike(@RequestParam Integer postId, @RequestParam Integer userId) {
-        return likeService.createLike(postId, userId);
+
+    @PostMapping("/likes/")
+    public ResponseEntity<Like> createLike(@RequestParam Integer postId) {
+        return likeService.createLike(postId);
     }
 
     @DeleteMapping("/likes/{id}")
