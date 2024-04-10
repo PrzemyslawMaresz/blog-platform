@@ -1,7 +1,7 @@
 # Blog platform
 
 Backend  service for a blog platform developed in Spring Boot.
-he platform enables users to publish their own articles and share them with others.
+The platform enables users to publish their own articles and share them with others.
 Users can also comment on articles and like them.
 Articles can be filtered by categories and authors.
 
