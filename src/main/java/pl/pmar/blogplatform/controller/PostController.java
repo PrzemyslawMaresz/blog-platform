@@ -2,7 +2,6 @@ package pl.pmar.blogplatform.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import pl.pmar.blogplatform.model.entity.Comment;
 import pl.pmar.blogplatform.model.entity.Post;
