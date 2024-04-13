@@ -13,4 +13,4 @@ Currently, I am working on the frontend part of the platform in Angular
 to showcase the functionality of the service.
 
 ## Technologies
-Java 17, Spring Boot, Spring Security, Spring Data JPA, Hibernate, PostgreSQL, Maven
+Java 17, Spring Boot, Spring Security, Spring Data JPA, Hibernate, JUnit, Mockito, PostgreSQL, Maven
