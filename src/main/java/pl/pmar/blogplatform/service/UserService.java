@@ -41,26 +41,26 @@ public class UserService {
     }
 
     public ResponseEntity<User> getUserById(Integer id) {
-        Optional<User> userOptional = userRepository.findById(id);
-        if (userOptional.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-        User user = userOptional.get();
-        if (contextService.isUserAuthorized(user.getId())) {
-            return ResponseEntity.ok(user);
-        } else {
+
+        if (!contextService.isUserAuthorized(id)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+
         }
+        return userRepository.findById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
 
     }
 
     public ResponseEntity<Void> deleteUser(Integer id) {
+
+        if (!contextService.isUserAuthorized(id)){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
         Optional<User> user = userRepository.findById(id);
         if (user.isEmpty()) {
             return ResponseEntity.notFound().build();
-        }
-        if (!contextService.isUserAuthorized(id)){
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
         List<Post> userPosts = postRepository.findAllByAuthorId(id);
@@ -71,16 +71,22 @@ public class UserService {
     }
 
     public ResponseEntity<User> updateUser(User updatedUser) {
+
+        if (!contextService.isUserAuthorized(updatedUser.getId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
         Optional<User> userOptional = userRepository.findById(updatedUser.getId());
         if (userOptional.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
         User user = userOptional.get();
-        if (!contextService.isUserAuthorized(user.getId())) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
+
         user.setUsername(updatedUser.getUsername());
         user.setEmail(updatedUser.getEmail());
+        if (contextService.isUserAdmin()) {
+            user.setRoles(updatedUser.getRoles());
+        }
 
         return ResponseEntity.ok(userRepository.save(user));
     }
