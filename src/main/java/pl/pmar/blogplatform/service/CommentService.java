@@ -9,7 +9,6 @@ import pl.pmar.blogplatform.model.entity.Post;
 import pl.pmar.blogplatform.model.entity.User;
 import pl.pmar.blogplatform.repository.CommentRepository;
 import pl.pmar.blogplatform.repository.PostRepository;
-import pl.pmar.blogplatform.repository.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -56,8 +55,7 @@ public class CommentService {
         comment.setAuthor(userOptional.get());
         comment.setCreationDate(LocalDateTime.now());
         post.getComments().add(comment);
-        commentRepository.save(comment);
-        return ResponseEntity.status(HttpStatus.CREATED).body(comment);
+        return ResponseEntity.status(HttpStatus.CREATED).body(commentRepository.save(comment));
 
     }
 
