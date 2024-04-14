@@ -9,7 +9,6 @@ import pl.pmar.blogplatform.model.entity.Post;
 import pl.pmar.blogplatform.model.entity.User;
 import pl.pmar.blogplatform.repository.LikeRepository;
 import pl.pmar.blogplatform.repository.PostRepository;
-import pl.pmar.blogplatform.repository.UserRepository;
 
 import java.util.Optional;
 
@@ -40,8 +39,7 @@ public class LikeService {
             return ResponseEntity.notFound().build();
         }
         int postAuthorId = postOptional.get().getAuthor().getId();
-        int userId = userOptional.get().getId();
-        if (userId == postAuthorId) {
+        if (! contextService.isUserAuthor(postAuthorId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
