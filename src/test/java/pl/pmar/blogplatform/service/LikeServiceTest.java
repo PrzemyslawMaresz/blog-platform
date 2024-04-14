@@ -1,4 +1,4 @@
-package pl.pmar.blogplatform;
+package pl.pmar.blogplatform.service;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,8 +12,6 @@ import pl.pmar.blogplatform.model.entity.Post;
 import pl.pmar.blogplatform.model.entity.User;
 import pl.pmar.blogplatform.repository.LikeRepository;
 import pl.pmar.blogplatform.repository.PostRepository;
-import pl.pmar.blogplatform.service.LikeService;
-import pl.pmar.blogplatform.service.SecurityContextService;
 
 import java.util.ArrayList;
 import java.util.Optional;
