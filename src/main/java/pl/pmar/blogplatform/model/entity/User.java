@@ -1,5 +1,6 @@
 package pl.pmar.blogplatform.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -20,9 +21,11 @@ public class User {
     private String username;
 
     @Column(name = "password")
+    @JsonIgnore
     private String password;
 
     @Column(name = "email")
+    @JsonIgnore
     private String email;
 
     @ManyToMany(fetch = FetchType.LAZY)
