@@ -53,6 +53,6 @@ public class SecurityContextService {
     }
 
     public boolean isUserAuthorized(Integer userId) {
-        return isUserAdmin() || isUserAuthor(userId);
+        return isUserAdmin() || isUserModerator() || isUserAuthor(userId);
     }
 }
