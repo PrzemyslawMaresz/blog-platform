@@ -38,9 +38,10 @@ public class LikeService {
         if (postOptional.isEmpty() || userOptional.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-        int postAuthorId = postOptional.get().getAuthor().getId();
-        if (! contextService.isUserAuthor(postAuthorId)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+
+        int userId = userOptional.get().getId();
+        if (likeRepository.existsByPostIdAndUserId(postId, userId)) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
 
         Like like = new Like();
@@ -52,23 +53,16 @@ public class LikeService {
 
     }
 
-    public ResponseEntity<Void> deleteLike(Integer likeId) {
-        Optional<Like> likeOptional = likeRepository.findById(likeId);
+    public ResponseEntity<Void> deleteLikeByPostId(Integer postId) {
+        Optional<User> userOptional = contextService.getUserFromContext();
+        if (userOptional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        Optional<Like> likeOptional = likeRepository.findByPostIdAndUserId(postId, userOptional.get().getId());
         if (likeOptional.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
         Like like = likeOptional.get();
-
-        Optional<User> userOptional = contextService.getUserFromContext();
-        Optional<Post> postOptional = postRepository.findPostByLikesId(like.getId());
-        if (userOptional.isEmpty() || postOptional.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-
-        int postAuthorId = postOptional.get().getAuthor().getId();
-        if (! contextService.isUserAuthor(postAuthorId) ) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
         likeRepository.delete(like);
 
         return ResponseEntity.noContent().build();

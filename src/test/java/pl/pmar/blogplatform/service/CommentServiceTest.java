@@ -75,14 +75,11 @@ public class CommentServiceTest {
     }
 
     @Test
-    public void addComment_asAuthorizedUser_ShouldReturnCreated() {
+    public void addComment_asUser_ShouldReturnCreated() {
 
         // given
         given(contextService.getUserFromContext()).willReturn(Optional.of(userMock));
         given(postRepository.findById(1)).willReturn(Optional.of(postMock));
-        given(postMock.getAuthor()).willReturn(userMock);
-        given(userMock.getId()).willReturn(1);
-        given(contextService.isUserAuthorized(1)).willReturn(true);
         given(commentRepository.save(commentMock)).willReturn(commentMock);
 
         // when
@@ -95,23 +92,6 @@ public class CommentServiceTest {
         verify(postMock).getComments();
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         assertThat(body).isEqualTo(commentMock);
-    }
-
-    @Test
-    public void addComment_asUnauthorizedUser_ShouldReturnForbidden() {
-
-        // given
-        given(contextService.getUserFromContext()).willReturn(Optional.of(userMock));
-        given(postRepository.findById(1)).willReturn(Optional.of(postMock));
-        given(postMock.getAuthor()).willReturn(userMock);
-        given(userMock.getId()).willReturn(1);
-        given(contextService.isUserAuthorized(1)).willReturn(false);
-
-        // when
-        ResponseEntity<Comment> response = commentService.addComment(commentMock, 1);
-
-        // then
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
     }
 
     @Test
@@ -196,47 +176,12 @@ public class CommentServiceTest {
     }
 
     @Test
-    public void deleteComment_asCommentAuthor_ShouldReturnNoContent() {
+    public void deleteComment_asAuthorizedUser_ShouldReturnNoContent() {
 
         // given
         given(commentRepository.findById(1)).willReturn(Optional.of(commentMock));
         given(commentMock.getAuthor()).willReturn(userMock);
-        given(userMock.getId()).willReturn(1);
-        given(contextService.isUserAuthor(1)).willReturn(true);
-
-        // when
-        ResponseEntity<Void> response = commentService.deleteComment(1);
-
-        // then
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
-    }
-
-    @Test
-    public void deleteComment_asAdmin_ShouldReturnNoContent() {
-
-        // given
-        given(commentRepository.findById(1)).willReturn(Optional.of(commentMock));
-        given(commentMock.getAuthor()).willReturn(userMock);
-        given(userMock.getId()).willReturn(1);
-        given(contextService.isUserAdmin()).willReturn(true);
-
-
-        // when
-        ResponseEntity<Void> response = commentService.deleteComment(1);
-
-        // then
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
-    }
-
-    @Test
-    public void deleteComment_asModerator_ShouldReturnNoContent() {
-
-        // given
-        given(commentRepository.findById(1)).willReturn(Optional.of(commentMock));
-        given(commentMock.getAuthor()).willReturn(userMock);
-        given(userMock.getId()).willReturn(1);
-        given(contextService.isUserModerator()).willReturn(true);
-
+        given(contextService.isUserAuthorized(userMock.getId())).willReturn(true);
 
         // when
         ResponseEntity<Void> response = commentService.deleteComment(1);
@@ -251,10 +196,7 @@ public class CommentServiceTest {
         // given
         given(commentRepository.findById(1)).willReturn(Optional.of(commentMock));
         given(commentMock.getAuthor()).willReturn(userMock);
-        given(userMock.getId()).willReturn(1);
-        given(contextService.isUserAuthor(1)).willReturn(false);
-        given(contextService.isUserAdmin()).willReturn(false);
-        given(contextService.isUserModerator()).willReturn(false);
+        given(contextService.isUserAuthorized(userMock.getId())).willReturn(false);
 
         // when
         ResponseEntity<Void> response = commentService.deleteComment(1);

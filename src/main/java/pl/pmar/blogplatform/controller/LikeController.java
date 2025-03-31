@@ -23,8 +23,8 @@ public class LikeController {
         return likeService.createLike(postId);
     }
 
-    @DeleteMapping("/likes/{id}")
-    public ResponseEntity<Void> deleteLike(@PathVariable Integer id) {
-        return likeService.deleteLike(id);
+    @DeleteMapping("/likes/")
+    public ResponseEntity<Void> deleteLike(@RequestParam Integer postId) {
+        return likeService.deleteLikeByPostId(postId);
     }
 }

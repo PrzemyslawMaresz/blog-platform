@@ -48,9 +48,6 @@ public class CommentService {
         }
 
         Post post = postOptional.get();
-        if (!contextService.isUserAuthorized(post.getAuthor().getId())) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
 
         comment.setAuthor(userOptional.get());
         comment.setCreationDate(LocalDateTime.now());
@@ -82,9 +79,7 @@ public class CommentService {
         }
         int authorId = commentOptional.get().getAuthor().getId();
 
-        if (contextService.isUserAuthor(authorId)
-                || contextService.isUserAdmin()
-                || contextService.isUserModerator()
+        if (contextService.isUserAuthorized(authorId)
         ) {
             commentRepository.delete(commentOptional.get());
             return ResponseEntity.noContent().build();

@@ -19,4 +19,8 @@ public class Like {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @ManyToOne
+    @JoinColumn(name = "post_id")
+    private Post post;
+
 }

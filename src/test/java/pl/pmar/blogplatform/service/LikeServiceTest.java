@@ -49,13 +49,10 @@ public class LikeServiceTest {
 
 
     @Test
-    public void createLike_asPostAuthor_shouldReturnLike() {
+    public void createLike_asUser_shouldReturnLike() {
         // given
         given(postRepository.findById(1)).willReturn(Optional.of(postMock));
         given(contextService.getUserFromContext()).willReturn(Optional.of(userMock));
-        given(postMock.getAuthor()).willReturn(authorMock);
-        given(authorMock.getId()).willReturn(1);
-        given(contextService.isUserAuthor(1)).willReturn(true);
         given(postMock.getLikes()).willReturn(new ArrayList<>());
         given(likeRepository.save(any(Like.class))).willReturn(likeMock);
 
@@ -66,24 +63,22 @@ public class LikeServiceTest {
         // then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         assertThat(body).isInstanceOf(Like.class);
-
     }
 
     @Test
-    public void createLike_asNotPostAuthor_shouldReturnForbidden() {
+    public void createLike_asUserButAlreadyLiked_shouldReturnConflict() {
         // given
         given(postRepository.findById(1)).willReturn(Optional.of(postMock));
         given(contextService.getUserFromContext()).willReturn(Optional.of(userMock));
-        given(postMock.getAuthor()).willReturn(authorMock);
-        given(authorMock.getId()).willReturn(1);
-        given(contextService.isUserAuthor(1)).willReturn(false);
+        given(likeRepository.existsByPostIdAndUserId(1, 1)).willReturn(true);
 
         // when
         ResponseEntity<Like> response = likeService.createLike(1);
 
         // then
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
     }
+
 
     @Test
     public void createLike_butPostNotFound_shouldReturnNotFound() {
@@ -98,65 +93,31 @@ public class LikeServiceTest {
     }
 
     @Test
-    public void deleteLike_asPostAuthor_shouldReturnNoContent() {
+    public void deleteLike_asUser_shouldReturnNoContent() {
         // given
-        given(likeRepository.findById(1)).willReturn(Optional.of(likeMock));
         given(contextService.getUserFromContext()).willReturn(Optional.of(userMock));
-        given(likeMock.getId()).willReturn(1);
-        given(postRepository.findPostByLikesId(1)).willReturn(Optional.of(postMock));
-        given(postMock.getAuthor()).willReturn(authorMock);
-        given(authorMock.getId()).willReturn(1);
-        given(contextService.isUserAuthor(1)).willReturn(true);
+        given(userMock.getId()).willReturn(1);
+        given(likeRepository.findByPostIdAndUserId(1, 1)).willReturn(Optional.of(likeMock));
 
         // when
-        ResponseEntity<Void> response = likeService.deleteLike(1);
+        ResponseEntity<Void> response = likeService.deleteLikeByPostId(1);
 
         // then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
     }
 
     @Test
-    public void deleteLike_asNotPostAuthor_shouldReturnForbidden() {
+    public void deleteLike_asNotLikeAuthor_shouldReturnForbidden() {
         // given
-        given(likeRepository.findById(1)).willReturn(Optional.of(likeMock));
         given(contextService.getUserFromContext()).willReturn(Optional.of(userMock));
-        given(likeMock.getId()).willReturn(1);
-        given(postRepository.findPostByLikesId(1)).willReturn(Optional.of(postMock));
-        given(postMock.getAuthor()).willReturn(authorMock);
-        given(authorMock.getId()).willReturn(1);
-        given(contextService.isUserAuthor(1)).willReturn(false);
+        given(userMock.getId()).willReturn(1);
+        given(likeRepository.findByPostIdAndUserId(1, 1)).willReturn(Optional.empty());
 
         // when
-        ResponseEntity<Void> response = likeService.deleteLike(1);
-
-        // then
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
-    }
-
-    @Test
-    public void deleteLike_butLikeNotFound_shouldReturnNotFound() {
-        // given
-        given(likeRepository.findById(1)).willReturn(Optional.empty());
-
-        // when
-        ResponseEntity<Void> response = likeService.deleteLike(1);
+        ResponseEntity<Void> response = likeService.deleteLikeByPostId(1);
 
         // then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
 
-    @Test
-    public void deleteLike_butPostNotFound_shouldReturnNotFound() {
-        // given
-        given(likeRepository.findById(1)).willReturn(Optional.of(likeMock));
-        given(contextService.getUserFromContext()).willReturn(Optional.of(userMock));
-        given(likeMock.getId()).willReturn(1);
-        given(postRepository.findPostByLikesId(1)).willReturn(Optional.empty());
-
-        // when
-        ResponseEntity<Void> response = likeService.deleteLike(1);
-
-        // then
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-    }
 }
